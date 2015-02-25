@@ -1,0 +1,8 @@
+- Shell so einrichten, dass der Windowscompiler ansprechbar ist ("cl")
+- Mit Shell in das code-Verzeichnis gehen
+- Folgenden Befehl vor Compile eingeben: set LIB=%CD%\lib;%LIB%
+- Folgenden Befehl für Compile eingeben: cl ExperimentalOpenGL.cpp glew32.lib
+
+-TODO: Wir können keine build.bat momentan machen, da wir unsere VisualStudio-Installation
+	an verschiedenen Orten haben. Daher können wir in einem Skript momentan nicht einfach 
+	die vcvarsall.bat aufrufen!
