@@ -6,3 +6,12 @@
 -TODO: Wir können keine build.bat momentan machen, da wir unsere VisualStudio-Installation
 	an verschiedenen Orten haben. Daher können wir in einem Skript momentan nicht einfach 
 	die vcvarsall.bat aufrufen!
+	
+- Also meine build.bat Datei enthält keine Informationen über die VS Installation. Das wird
+  in der shell.bat geregelt:
+
+	@echo off
+	call "C:\Program Files\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
+  
+  Habe die build.bat mal mit committed. Dieser muss lediglich, wie du sagtest, der Compiler
+  (cl) bereits bekannt sein. Die shell.bat müsste jeder individuell anlegen.
