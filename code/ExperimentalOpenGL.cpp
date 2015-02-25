@@ -1,15 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "incl/glew.h"
-#include "incl/freeglut.h"
+#include "incl/utils.h"
+#include "utils.c"
 #define WINDOW_TITLE_PREFIX "Chapter 2"
 
 typedef struct {
   float XYZW[4];
   float RGBA[4];
 } vertex;
-//hulluuu
+
 int currentWidth = 600,
     currentHeight = 600,
     WindowHandle = 0;
@@ -24,26 +21,6 @@ GLuint vertexShaderId,
        indexBufferId[2],
        activeIndexBuffer = 0,
        vertsToRender = 48;
-
-const GLchar *vertexShader = {
-  "#version 400\n"\
-  "layout(location=0) in vec4 in_Position;\n"\
-  "layout(location=1) in vec4 in_Color;\n"\
-  "out vec4 ex_color;\n"\
-  "void main(void) {\n"\
-  " gl_Position = in_Position;\n"\
-  " ex_color = in_Color;\n"\
-  "}\n"
-};
-
-const GLchar *fragmentShader = {
-  "#version 400\n"\
-  "in vec4 ex_color;\n"\
-  "out vec4 out_color;\n"\
-  "void main(void) {\n"\
-  "out_color = ex_color;\n"\
-  "}\n"
-};
  
 void initialize(int, char*[]);
 void initWindow(int, char*[]);
@@ -297,13 +274,9 @@ void destroyVBO(void) {
 void createShaders(void) {
   GLenum errorCheckValue = glGetError();
 
-  vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShaderId, 1, &vertexShader, NULL);
-  glCompileShader(vertexShaderId);
+  vertexShaderId = LoadShader("vertexshader.glsl", GL_VERTEX_SHADER);
 
-  fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShaderId, 1, &fragmentShader, NULL);
-  glCompileShader(fragmentShaderId);
+  fragmentShaderId = LoadShader("fragmentshader.glsl", GL_FRAGMENT_SHADER);
 
   programId = glCreateProgram();
   glAttachShader(programId, vertexShaderId);
