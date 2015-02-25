@@ -9,7 +9,7 @@ typedef struct {
   float XYZW[4];
   float RGBA[4];
 } vertex;
-
+//hulluuu
 int currentWidth = 600,
     currentHeight = 600,
     WindowHandle = 0;

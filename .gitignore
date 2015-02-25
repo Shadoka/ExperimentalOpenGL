@@ -25,6 +25,9 @@
 *.out
 *.app
 
+# Custom
+shell.bat
+
 # =========================
 # Operating System Files
 # =========================
