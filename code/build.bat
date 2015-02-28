@@ -1,9 +1,9 @@
 @echo off
 
 call ..\misc\shell.bat
+set LIB=%CD%\lib;%LIB%
 mkdir ..\build
 pushd ..\build
-set LIB=%CD%\lib;%LIB%
 cl ..\code\ExperimentalOpenGL.cpp glew32.lib
 popd
 
