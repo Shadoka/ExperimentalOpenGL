@@ -190,11 +190,13 @@ void destroyCube(void) {
 }
 
 void drawCube(void) {
-
+  float angle = glutGet(GLUT_ELAPSED_TIME) / 8000.0 * 45;
+  glm::vec3 axis_y(0.0, 1.0, 0.0);
+  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), angle, axis_y);
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
   glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
   glm::mat4 projection = glm::perspective(45.0f, 1.0f*currentWidth/currentHeight, 0.1f, 10.0f);
-  glm::mat4 mvp = projection * view * model;
+  glm::mat4 mvp = projection * view * model * anim;
 
   glUseProgram(shaderIds[0]);
   //ExitOnGLError("ERROR: Could not use the shader program");
