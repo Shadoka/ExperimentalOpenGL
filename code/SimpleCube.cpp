@@ -1,3 +1,5 @@
+#include <dsound.h>
+#include <XInput.h>
 #include "incl/utils.h"
 #include "utils.c"
 #include "glm/glm.hpp"
@@ -15,6 +17,7 @@ GLuint bufferIds[3] = {0},
   shaderIds[3] = {0};
 
 GLint uniform_mvp;
+float angle = 0.0f;
 
 void initialize(int, char*[]);
 void initWindow(int, char*[]);
@@ -25,6 +28,7 @@ void idleFunction(void);
 void drawCube(void);
 void createCube(void);
 void destroyCube(void);
+void evalController(void);
  
 int main(int argc, char* argv[])
 {
@@ -110,9 +114,24 @@ void renderFunction(void)
 {
   ++frameCount;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  evalController();
   drawCube();
 
   glutSwapBuffers();
+}
+
+void evalController() {
+  for (int x = 0; x < 4; x++) {
+    XINPUT_STATE inputState;
+    if (XInputGetState(x, &inputState) == ERROR_SUCCESS) {
+      XINPUT_GAMEPAD *pad = &inputState.Gamepad;
+      if (pad->sThumbLX < 0) {
+        angle = (float) pad->sThumbLX / 32768 * 360;
+      } else {
+        angle = (float) pad->sThumbLX / 32767 * 360;
+      }
+    }
+  }
 }
 
 void createCube(void) {
@@ -190,9 +209,10 @@ void destroyCube(void) {
 }
 
 void drawCube(void) {
-  float angle = glutGet(GLUT_ELAPSED_TIME) / 8000.0 * 45;
+  float realAngle = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * angle;
+  fprintf(stdout, "%f\n", angle);
   glm::vec3 axis_y(0.0, 1.0, 0.0);
-  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), angle, axis_y);
+  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), realAngle, axis_y);
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
   glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
   glm::mat4 projection = glm::perspective(45.0f, 1.0f*currentWidth/currentHeight, 0.1f, 10.0f);

@@ -29,8 +29,8 @@
 shell.bat
 
 #Debugoutput
-.ilk
-.pdb
+*.ilk
+*.pdb
 
 # =========================
 # Operating System Files
