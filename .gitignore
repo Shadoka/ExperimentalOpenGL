@@ -28,6 +28,10 @@
 # Custom
 shell.bat
 
+#Debugoutput
+.ilk
+.pdb
+
 # =========================
 # Operating System Files
 # =========================

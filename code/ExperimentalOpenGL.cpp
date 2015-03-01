@@ -19,7 +19,7 @@ Matrix projectionMatrix,
   modelMatrix;
 
 float cubeRotation = 0;
-clock_t lastTime;
+clock_t lastTime = 0;
  
 void initialize(int, char*[]);
 void initWindow(int, char*[]);
@@ -74,7 +74,7 @@ void initialize(int argc, char* argv[])
   modelMatrix = IDENTITY_MATRIX;
   projectionMatrix = IDENTITY_MATRIX;
   viewMatrix = IDENTITY_MATRIX;
-  TranslateMatrix(&viewMatrix, 0, 0, -2);
+  TranslateMatrix(&viewMatrix, 0, 0, -4);
 
   createCube();
 }
@@ -111,11 +111,11 @@ void initWindow(int argc, char* argv[])
   glutIdleFunc(idleFunction);
   glutTimerFunc(0, timerFunction, 0);
   glutCloseFunc(destroyCube);
-  //glutKeyboardFunc(keyboardFunction);
 }
  
 void resizeFunction(int Width, int Height)
 {
+  fprintf(stdout, "resize\n");
   currentWidth = Width;
   currentHeight = Height;
   glViewport(0, 0, currentWidth, currentHeight);
@@ -163,6 +163,7 @@ void createCube(void) {
   glLinkProgram(shaderIds[0]);
   ExitOnGLError("Error at linking shader program");
 
+  fprintf(stdout, "getting uniform locations\n");
   modelMatrixUniformLocation = glGetUniformLocation(shaderIds[0], "modelMatrix");
   viewMatrixUniformLocation = glGetUniformLocation(shaderIds[0], "viewMatrix");
   projectionMatrixUniformLocation = glGetUniformLocation(shaderIds[0], "projectionMatrix");
@@ -227,7 +228,6 @@ void drawCube(void) {
  
   glUniformMatrix4fv(modelMatrixUniformLocation, 1, GL_FALSE, modelMatrix.m);
   glUniformMatrix4fv(viewMatrixUniformLocation, 1, GL_FALSE, viewMatrix.m);
-  glUniformMatrix4fv(projectionMatrixUniformLocation, 1, GL_FALSE, projectionMatrix.m);
   ExitOnGLError("ERROR: Could not set the shader uniforms");
 
   glBindVertexArray(bufferIds[0]);

@@ -132,7 +132,7 @@ void ExitOnGLError(const char* error_message)
   if (ErrorValue != GL_NO_ERROR)
   {
     fprintf(stderr, "%s: %s\n", error_message, gluErrorString(ErrorValue));
-    exit(EXIT_FAILURE);
+    //exit(EXIT_FAILURE);
   }
 }
  
