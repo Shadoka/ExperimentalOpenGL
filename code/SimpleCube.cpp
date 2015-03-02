@@ -1,4 +1,5 @@
-#include <dsound.h>
+// windows.h wird für XInput benötigt. blargh.
+#include <windows.h>
 #include <XInput.h>
 #include "incl/utils.h"
 #include "utils.c"
