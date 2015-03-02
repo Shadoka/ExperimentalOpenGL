@@ -18,7 +18,8 @@ GLuint bufferIds[3] = {0},
   textureId;
 
 GLint uniform_mvp;
-float angle = 0.0f;
+float stickX = 0.0f;
+float stickY = 0.0f;
 
 void initialize(int, char*[]);
 void initWindow(int, char*[]);
@@ -126,33 +127,54 @@ void evalController() {
     XINPUT_STATE inputState;
     if (XInputGetState(x, &inputState) == ERROR_SUCCESS) {
       XINPUT_GAMEPAD *pad = &inputState.Gamepad;
-      if (pad->sThumbLX < 0) {
-        angle = (float) pad->sThumbLX / 32768 * 360;
-      } else {
-        angle = (float) pad->sThumbLX / 32767 * 360;
-      }
-    }
+
+	  float INPUT_DEADZONE = 0.2f;
+	  float LX = pad->sThumbLX;
+	  float LY = pad->sThumbLY;
+
+	  //determine how far the controller is pushed
+	  float magnitude = sqrt(LX*LX + LY*LY);
+	  float normalizedMagnitude = 0;
+
+	  //determine the direction the controller is pushed
+	  float normalizedLX = LX / magnitude;
+	  float normalizedLY = LY / magnitude;
+
+	  //check if the controller is outside a circular dead zone
+	  if (magnitude > INPUT_DEADZONE) {
+	    if (magnitude > 32767) magnitude = 32767;
+	    
+		//adjust magnitude relative to the end of the dead zone
+		magnitude -= INPUT_DEADZONE;
+		normalizedMagnitude = magnitude / (32767 - INPUT_DEADZONE);
+	  } else {
+		  normalizedMagnitude = 0.0;
+	  }
+
+	  stickX = LX * normalizedMagnitude;
+	  stickY = LY * normalizedMagnitude;
+	}
   }
 }
 
 void createCube(void) {
   const Vertex vertices[8] = {
-    {{-0.5f, -0.5f, 0.5f, 1}, {0, 0, 1, 1}},
-    {{-0.5f, 0.5f, 0.5f, 1}, {1, 0, 0, 1}},
-    {{0.5f, 0.5f, 0.5f, 1}, {0, 1, 0, 1}},
-    {{0.5f, -0.5f, 0.5f, 1}, {1, 1, 0, 1}},
+    {{-0.5f, -0.5f,  0.5f, 1}, {0, 0, 1, 1}},
+    {{-0.5f,  0.5f,  0.5f, 1}, {1, 0, 0, 1}},
+    {{ 0.5f,  0.5f,  0.5f, 1}, {0, 1, 0, 1}},
+    {{ 0.5f, -0.5f,  0.5f, 1}, {1, 1, 0, 1}},
     {{-0.5f, -0.5f, -0.5f, 1}, {1, 1, 1, 1}},
-    {{-0.5f, 0.5f, -0.5f, 1}, {1, 0, 0, 1}},
-    {{0.5f, 0.5f, -0.5f, 1}, {1, 0, 1, 1}},
-    {{0.5f, -0.5f, -0.5f, 1}, {0, 0, 1, 1}}
+    {{-0.5f,  0.5f, -0.5f, 1}, {1, 0, 0, 1}},
+    {{ 0.5f,  0.5f, -0.5f, 1}, {1, 0, 1, 1}},
+    {{ 0.5f, -0.5f, -0.5f, 1}, {0, 0, 1, 1}}
   };
   const GLuint indices[36] = {
-    0,2,1,  0,3,2,
-    4,3,0,  4,7,3,
-    4,1,5,  4,0,1,
-    3,6,2,  3,7,6,
-    1,6,5,  1,2,6,
-    7,5,6,  7,4,5
+    0, 2, 1,	0, 3, 2,
+    4, 3, 0,	4, 7, 3,
+    4, 1, 5,	4, 0, 1,
+    3, 6, 2,	3, 7, 6,
+    1, 6, 5,	1, 2, 6,
+    7, 5, 6,	7, 4, 5
   };
   shaderIds[0] = glCreateProgram();
   ExitOnGLError("Error at creating the shader program");
@@ -214,10 +236,11 @@ void destroyCube(void) {
 }
 
 void drawCube(void) {
-  float realAngle = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * angle;
-  fprintf(stdout, "%f\n", angle);
+  float angleX = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickX / 360;
+  float angleY = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickY / 360;
+  fprintf(stdout, "%f\n", angleX);
   glm::vec3 axis_y(0.0, 1.0, 0.0);
-  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), realAngle, axis_y);
+  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), angleX, axis_y);
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
   glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
   glm::mat4 projection = glm::perspective(45.0f, 1.0f*currentWidth/currentHeight, 0.1f, 10.0f);
