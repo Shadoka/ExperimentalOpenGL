@@ -14,7 +14,8 @@ int currentWidth = 600,
 unsigned frameCount = 0;
 
 GLuint bufferIds[3] = {0},
-  shaderIds[3] = {0};
+  shaderIds[3] = {0},
+  textureId;
 
 GLint uniform_mvp;
 float angle = 0.0f;
@@ -63,7 +64,7 @@ void initialize(int argc, char* argv[])
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
   glEnable(GL_DEPTH_TEST);
-  //glDepthFunc(GL_LESS);
+  glDepthFunc(GL_LESS);
 
   createCube();
 }
@@ -168,6 +169,9 @@ void createCube(void) {
     fprintf(stdout, "uniform nicht gefunden\n");
   }
 
+  textureId = loadBMP("texture.bmp");
+  ExitOnGLError("ERROR: Could not create textures.");
+
   glGenVertexArrays(1, &bufferIds[0]);
   ExitOnGLError("ERROR: Could not generate the VAO");
   glBindVertexArray(bufferIds[0]);
@@ -203,6 +207,7 @@ void destroyCube(void) {
   glDeleteProgram(shaderIds[0]);
   ExitOnGLError("ERROR: Could not destroy the shaders");
  
+  glDeleteTextures(1, &textureId);
   glDeleteBuffers(2, &bufferIds[1]);
   glDeleteVertexArrays(1, &bufferIds[0]);
   ExitOnGLError("ERROR: Could not destroy the buffer objects");
@@ -219,15 +224,15 @@ void drawCube(void) {
   glm::mat4 mvp = projection * view * model * anim;
 
   glUseProgram(shaderIds[0]);
-  //ExitOnGLError("ERROR: Could not use the shader program");
+  ExitOnGLError("ERROR: Could not use the shader program");
  
   glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
   glBindVertexArray(bufferIds[0]);
-  //ExitOnGLError("ERROR: Could not bind the VAO for drawing purposes");
+  ExitOnGLError("ERROR: Could not bind the VAO for drawing purposes");
  
   glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (GLvoid*)0);
-  //ExitOnGLError("ERROR: Could not draw the cube");
+  ExitOnGLError("ERROR: Could not draw the cube");
  
   glBindVertexArray(0);
   glUseProgram(0);
