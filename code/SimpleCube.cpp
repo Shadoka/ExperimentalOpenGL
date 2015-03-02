@@ -1,7 +1,6 @@
 // windows.h wird für XInput benötigt. blargh.
 #include <windows.h>
 #include <XInput.h>
-#include "incl/utils.h"
 #include "utils.c"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
