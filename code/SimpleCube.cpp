@@ -128,31 +128,17 @@ void evalController() {
     if (XInputGetState(x, &inputState) == ERROR_SUCCESS) {
       XINPUT_GAMEPAD *pad = &inputState.Gamepad;
 
-	  float INPUT_DEADZONE = 0.3f;
-	  float LX = pad->sThumbLX;
-	  float LY = pad->sThumbLY;
+	  float deadzoneX = 0.5f;
+	  float deadzoneY = 0.3f;
 
-	  //determine how far the controller is pushed
-	  float magnitude = sqrt(LX*LX + LY*LY);
-	  float normalizedMagnitude = 0;
+	  float normLX = fmaxf(-1, (float)pad->sThumbLX / 32767);
+	  float normLY = fmaxf(-1, (float)pad->sThumbLY / 32767);
 
-	  //determine the direction the controller is pushed
-	  float normalizedLX = LX / magnitude;
-	  float normalizedLY = LY / magnitude;
+	  stickX = (abs(normLX) < deadzoneX ? 0 : (abs(normLX) - deadzoneX) * (normLX / abs(normLX)));
+	  stickY = (abs(normLY) < deadzoneY ? 0 : (abs(normLY) - deadzoneY) * (normLY / abs(normLY)));
 
-	  //check if the controller is outside a circular dead zone
-	  if (magnitude > INPUT_DEADZONE) {
-	    if (magnitude > 32767) magnitude = 32767;
-	    
-		//adjust magnitude relative to the end of the dead zone
-		magnitude -= INPUT_DEADZONE;
-		normalizedMagnitude = magnitude / (32767 - INPUT_DEADZONE);
-	  } else {
-		  normalizedMagnitude = 0.0;
-	  }
-
-	  stickX = LX * normalizedMagnitude / 10.0;
-	  stickY = LY * normalizedMagnitude / 10.0;
+	  if (deadzoneX > 0) stickX *= 1 / (1 - deadzoneX);
+	  if (deadzoneY > 0) stickY *= 1 / (1 - deadzoneY);
 	}
   }
 }
@@ -236,8 +222,8 @@ void destroyCube(void) {
 }
 
 void drawCube(void) {
-  float angleX = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickX / 360;
-  float angleY = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickY / 360;
+  float angleX = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickX * 5;
+  float angleY = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickY * 5;
   fprintf(stdout, "%f\n", angleX);
   glm::vec3 axis_y(0.0, 1.0, 0.0);
   glm::vec3 axis_x(1.0, 0.0, 0.0);
