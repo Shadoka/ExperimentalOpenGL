@@ -128,7 +128,7 @@ void evalController() {
     if (XInputGetState(x, &inputState) == ERROR_SUCCESS) {
       XINPUT_GAMEPAD *pad = &inputState.Gamepad;
 
-	  float INPUT_DEADZONE = 0.2f;
+	  float INPUT_DEADZONE = 0.3f;
 	  float LX = pad->sThumbLX;
 	  float LY = pad->sThumbLY;
 
@@ -151,8 +151,8 @@ void evalController() {
 		  normalizedMagnitude = 0.0;
 	  }
 
-	  stickX = LX * normalizedMagnitude;
-	  stickY = LY * normalizedMagnitude;
+	  stickX = LX * normalizedMagnitude / 10.0;
+	  stickY = LY * normalizedMagnitude / 10.0;
 	}
   }
 }
@@ -240,11 +240,13 @@ void drawCube(void) {
   float angleY = (glutGet(GLUT_ELAPSED_TIME) / 10000.0) * stickY / 360;
   fprintf(stdout, "%f\n", angleX);
   glm::vec3 axis_y(0.0, 1.0, 0.0);
-  glm::mat4 anim = glm::rotate(glm::mat4(1.0f), angleX, axis_y);
+  glm::vec3 axis_x(1.0, 0.0, 0.0);
+  glm::mat4 animX = glm::rotate(glm::mat4(1.0f), angleX, axis_y);
+  glm::mat4 animY = glm::rotate(glm::mat4(1.0f), angleY, axis_x);
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
   glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
   glm::mat4 projection = glm::perspective(45.0f, 1.0f*currentWidth/currentHeight, 0.1f, 10.0f);
-  glm::mat4 mvp = projection * view * model * anim;
+  glm::mat4 mvp = projection * view * model * animX * animY;
 
   glUseProgram(shaderIds[0]);
   ExitOnGLError("ERROR: Could not use the shader program");
